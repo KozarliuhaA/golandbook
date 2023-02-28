@@ -1,0 +1,35 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+var counter int
+
+func main() {
+	http.HandleFunc("/value", newHandler)
+	http.HandleFunc("/get", get)
+	http.HandleFunc("/incr", incr)
+	http.ListenAndServe(":9000", nil)
+}
+
+func incr(res http.ResponseWriter, req *http.Request) {
+	counter += 1
+	res.WriteHeader(200)
+
+}
+func get(res http.ResponseWriter, req *http.Request) {
+	var counterStr = fmt.Sprintf("counter value: %d\n \n", counter)
+	res.WriteHeader(200)
+	res.Write([]byte(counterStr))
+}
+func newHandler(res http.ResponseWriter, r *http.Request) {
+	fmt.Println("GET params were:", r.URL.Query())
+
+	value := r.URL.Query().Get("value")
+	if value < 0 && value == "" {
+		res.WriteHeader(400)
+	}
+
+}
